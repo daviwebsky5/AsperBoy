@@ -22,11 +22,7 @@
 https://youtu.be/gSknh5Afvj8
 
 
-## Screenshots
-
-
 ## Equipe
 - Davi Augusto de Oliveira Websky
 - Gabriel de Paula Valemtim
 - Lucas Vinicius Presaniuk Goncalves
-
