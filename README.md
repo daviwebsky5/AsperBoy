@@ -15,8 +15,6 @@
 **Testes-e-Validação:** Roblox studio
 
 
-
-
 ## Demonstração
 
 https://youtu.be/gSknh5Afvj8
