@@ -1,5 +1,5 @@
 
-# Asperboy: Jogo de Aprendizado para crianças autistas
+# Asperboy: Jogo para aprendizado para crianças autistas
 
 É um jogo na plataforma Roblox que tem como objetivo conscientizar sobre a síndrome de asperger, e também ajudar pessoas com síndrome de asperger a como proceder em certas situações.
 
