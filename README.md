@@ -26,6 +26,12 @@ Requisitos para rodar o jogo no computador
 
 * Espaço de armazenamento disponivel: 300mb
 
+## Como jogar
+
+* Instale o roblox pelo site oficial deles: https://www.roblox.com/pt/download
+
+* Procure pelo jogo AsperBoy https://www.roblox.com/pt/games/111736734135596/AsperBoy#!/about
+
 ## Demonstração
 
 https://youtu.be/gSknh5Afvj8
@@ -34,3 +40,9 @@ https://youtu.be/gSknh5Afvj8
 - Davi Augusto de Oliveira Websky
 - Gabriel de Paula Valemtim
 - Lucas Vinicius Presaniuk Goncalves
+
+## Orientadora
+Adriane Roberta Ribeiro de Macedo
+
+##Coorientador
+Felipe Ventura Oliveira
