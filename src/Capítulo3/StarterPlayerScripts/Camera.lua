@@ -20,7 +20,14 @@ local screenGui = playerGui:WaitForChild("TelaPretaGui")
 local blackFrame = screenGui:WaitForChild("Frame")
 
 ---------------------------------------------------------------------
--- GUI DE DIÁLOGO DURANTE A TELA PRETA
+-- IMAGEM DA CUTSCENE
+---------------------------------------------------------------------
+local cutsceneImage = screenGui:WaitForChild("CutsceneImage")
+cutsceneImage.Visible = false
+cutsceneImage.ImageTransparency = 1
+
+---------------------------------------------------------------------
+-- GUI DE DIÁLOGO
 ---------------------------------------------------------------------
 local dialogGui = playerGui:WaitForChild("Dialog2")
 local dialogFrame = dialogGui:WaitForChild("Frame")
@@ -28,7 +35,30 @@ local dialogLabel = dialogFrame:WaitForChild("DialogLabel")
 local nameLabel = dialogFrame:WaitForChild("NameLabel")
 local nextButton = dialogFrame:WaitForChild("NextButton")
 
-dialogGui.Enabled = false  -- começa desligado
+dialogGui.Enabled = false
+
+---------------------------------------------------------------------
+-- TYPEWRITER (DIGITAÇÃO)
+---------------------------------------------------------------------
+local typing = false  -- indica se está digitando
+
+local function typewrite(label, text, speed)
+	typing = true
+	label.Text = ""
+
+	for i = 1, #text do
+		label.Text = string.sub(text, 1, i)
+
+		if not typing then
+			label.Text = text
+			return
+		end
+
+		task.wait(speed)
+	end
+
+	typing = false
+end
 
 ---------------------------------------------------------------------
 -- FUNÇÕES GERAIS
@@ -40,24 +70,40 @@ local function tween(object, properties, duration, style, direction)
 	return TweenService:Create(object, info, properties)
 end
 
--- FADE IN: escurece a tela e PARA
 local function fadeBlackIn(timeIn)
 	blackFrame.BackgroundTransparency = 1
 	tween(blackFrame, {BackgroundTransparency = 0}, timeIn):Play()
 	task.wait(timeIn)
 end
 
--- FADE OUT: tira a tela preta
 local function fadeBlackOut(timeOut)
 	tween(blackFrame, {BackgroundTransparency = 1}, timeOut):Play()
 	task.wait(timeOut)
 end
 
+---------------------------------------------------------------------
+-- CUTSCENE IMAGEM
+---------------------------------------------------------------------
+local function tocarCutsceneImagem()
+	cutsceneImage.Visible = true
+	cutsceneImage.ImageTransparency = 1
+	tween(cutsceneImage, {ImageTransparency = 0}, 1):Play()
+	task.wait(1)
+end
+
+local function esconderCutsceneImagem()
+	tween(cutsceneImage, {ImageTransparency = 1}, 1):Play()
+	task.wait(1)
+	cutsceneImage.Visible = false
+end
 
 ---------------------------------------------------------------------
--- SISTEMA DE DIÁLOGO COM BOTÃO
+-- SISTEMA DE DIÁLOGO COM TYPEWRITER
 ---------------------------------------------------------------------
-local function executarDialogosComBotao(lista)
+---------------------------------------------------------------------
+-- SISTEMA DE DIÁLOGO COM TYPEWRITER
+---------------------------------------------------------------------
+local function executarDialogosComBotao(lista, cam)
 	if not lista or #lista == 0 then return end
 
 	dialogGui.Enabled = true
@@ -66,20 +112,37 @@ local function executarDialogosComBotao(lista)
 	local index = 1
 	local total = #lista
 
+	-- Função de mostrar a fala
 	local function mostrar(i)
 		local fala = lista[i]
-		dialogLabel.Text = fala.texto or ""
+
 		nameLabel.Text = fala.nome or ""
+
+		-- Iniciar digitação
+		typing = true
+		typewrite(dialogLabel, fala.texto or "", 0.02)
 	end
 
 	mostrar(index)
 
 	local connection
 	connection = nextButton.MouseButton1Click:Connect(function()
+
+
+		
+		if typing == true then
+			return
+		end
+
 		index += 1
 
 		if index > total then
 			connection:Disconnect()
+
+			if cam.cutscene then
+				esconderCutsceneImagem()
+			end
+
 			dialogGui.Enabled = false
 			return
 		end
@@ -87,8 +150,10 @@ local function executarDialogosComBotao(lista)
 		mostrar(index)
 	end)
 
+	-- Quando terminar tudo
 	repeat task.wait() until index > total
 end
+
 
 ---------------------------------------------------------------------
 -- ATUALIZAÇÃO DA CÂMERA
@@ -143,6 +208,7 @@ local cameraList = {
 		mode = "followPlayer",
 		fov = 60
 	},
+
 	{
 		name = "Onibus2",
 		type = "touch",
@@ -160,6 +226,7 @@ local cameraList = {
 		mode = "followPlayer",
 		fov = 60
 	},
+
 	{
 		name = "CaminhoGrande1",
 		type = "touch",
@@ -188,13 +255,11 @@ local cameraList = {
 		mode = "lookAtPart",
 		lookAtPartName = "ParedeCaminhoCerto",
 		fov = 90,
-		
+
 		dialogos = {
 			{nome = "Você", texto = "Esse parece mais calmo..."},
 		}
-		
 	},
-
 
 	-- CAMINHO ERRADO 1
 	{
@@ -207,7 +272,6 @@ local cameraList = {
 		fov = 70,
 		teleportTo = "TpPuzzleSair",
 
-		-- SOM AQUI
 		soundName = "SomPessoas",
 
 		dialogos = {
@@ -216,8 +280,7 @@ local cameraList = {
 		}
 	},
 
-
-	-- CAMINHO ERRADO 2
+	-- CAMINHO ERRADO 2 (CUTSCENE)
 	{
 		name = "TpErrado2",
 		type = "touch",
@@ -227,15 +290,15 @@ local cameraList = {
 		fov = 70,
 		teleportTo = "TpPuzzleSair",
 
-		-- SOM AQUI
 		soundName = "SomCarro",
+		cutscene = true,
 
 		dialogos = {
 			{nome = "Você", texto = "Aqui tem muitos carros!!"},
 			{nome = "Você", texto = "Não consigo ir por aqui..."},
 		}
 	},
-	
+
 	{
 		name = "CaminhoCerto2",
 		type = "touch",
@@ -245,6 +308,7 @@ local cameraList = {
 		lookAtPartName = "ParedeCaminhoCerto2",
 		fov = 90
 	},
+
 	{
 		name = "CaminhoCerto3",
 		type = "touch",
@@ -254,6 +318,7 @@ local cameraList = {
 		lookAtPartName = "ParedeCaminhoCerto3",
 		fov = 90
 	},
+
 	{
 		name = "Casa",
 		type = "touch",
@@ -263,14 +328,11 @@ local cameraList = {
 		lookAtPartName = "ParedeCasa",
 		fov = 90
 	},
-
-
 }
 
 ---------------------------------------------------------------------
 -- CONECTAR TRIGGERS
 ---------------------------------------------------------------------
--- CONECTAR TRIGGERS
 for _, cam in ipairs(cameraList) do
 	local trigger = workspace:WaitForChild(cam.triggerName)
 
@@ -281,18 +343,17 @@ for _, cam in ipairs(cameraList) do
 		tween(camera, {FieldOfView = cam.fov}, 1):Play()
 
 		if not cam.teleportTo then
-			-- Se tiver dialogo e AINDA não falou
 			if cam.dialogos and not cam.jaFalou then
 				cam.jaFalou = true
-				executarDialogosComBotao(cam.dialogos)
+				executarDialogosComBotao(cam.dialogos, cam)
 			end
 			return
 		end
 
-		-- FADE IN: deixa tudo preto
+		-- FADE IN
 		fadeBlackIn(1)
 
-		-- SOM DO CAMINHO
+		-- SOM
 		local currentSound
 		if cam.soundName then
 			local s = workspace:FindFirstChild(cam.soundName)
@@ -311,20 +372,25 @@ for _, cam in ipairs(cameraList) do
 
 		task.wait(0.2)
 
-		-- DIÁLOGO enquanto está preto
-		if cam.dialogos then
-			executarDialogosComBotao(cam.dialogos)
+		-- CUTSCENE
+		if cam.cutscene then
+			tocarCutsceneImagem()
 		end
+
+		-- 🔥 CORREÇÃO PRINCIPAL
+		if cam.dialogos and not cam.jaFalou then
+			cam.jaFalou = true  -- <-- evita repetir sempre
+			executarDialogosComBotao(cam.dialogos, cam)
+		end
+
 
 		-- FADE OUT
 		fadeBlackOut(1)
 
-		-- PARA O SOM depois do fade
+		-- PARAR SOM
 		if currentSound then
 			currentSound:Stop()
 		end
 
 	end)
 end
-
-	
