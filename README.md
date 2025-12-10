@@ -30,7 +30,7 @@ Requisitos para rodar o jogo no computador
 
 * Instale o roblox pelo site oficial deles: https://www.roblox.com/pt/download
 
-* Procure pelo jogo AsperBoy https://www.roblox.com/pt/games/111736734135596/AsperBoy#!/about
+* Procure pelo jogo AsperBoy https://www.roblox.com/pt/games/111736734135596/AsperBoy
 
 ## Demonstração
 
